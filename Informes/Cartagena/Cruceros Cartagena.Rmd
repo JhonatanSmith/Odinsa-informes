@@ -29,20 +29,24 @@ El puerto de Cartagena lo adminsitra el grupo "GRUPO PUERTO DE CARTAGENA", que h
 
 El puerto de Cartagena es un punto maritimo que atiende diferentes tipos de embarcaciones. En particular se tiene informacion para los años 2021 y 2022. Cabe destacar los efectos de la pandemia por COVID-19 han afectado significativamente los datos existentes, por tanto los analisis predictivos aqui presente son meramente descriptivos y *NO* una predicion confiable de los datos. Se toman datos de los años 2021 y 2022.
 
+A partir del 2021, el puerto de Cartagena comenzó un proceso de reactivacion economica causado por la pandemia. A continuacion se muestra las proyecciones economicas del puerto. 
+
+[![Esta es una imagen de ejemplo](C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Odinsa-informes/Informes/Cartagena/Captura de pantalla 2022-10-09 003016.png)]
+
 Todos los analisis presentes se obtienen de diferentes fuentes de informacion. un primer analisis indiscriminado de los años, es del numero total de pasajeros por empresas que brindan los servicios de turismo en cruceros, en particular:
 
 ```{r include=FALSE}
-total.2021 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2021.xlsx")
+total.2021 <- read_excel("total_2021.xlsx")
 total.2021[is.na(total.2021)] = 0
-total.2022 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2022.xlsx")
+total.2022 <- read_excel("total_2022.xlsx")
 total.2022[is.na(total.2022)] = 0
-total.2020 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2020.xlsx")
+total.2020 <- read_excel("Total_2020.xlsx")
 total.2020[is.na(total.2020)] = 0
-bd = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/bd.xlsx")
+bd = read_excel("bd.xlsx")
 bd21 = filter(.data =bd,  bd$Año==2021)
 bd22 = filter(.data =bd,  bd$Año==2022)
-cruc = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/total_empresa.xlsx")
-pax.mes = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/total_empresa.xlsx", sheet = "Hoja2")
+cruc = read_excel("total_empresa.xlsx")
+pax.mes = read_excel("total_empresa.xlsx", sheet = "Hoja2")
 names(pax.mes)= c("Mes", "Pax")
 ```
 
@@ -171,4 +175,6 @@ El comportamiento general del tipo de embaraciones no ha cambiado de un año a o
 
 1) https://www.puertocartagena.com/sites/default/files/inline/infografia-reactivacion-cruceros-porticolive_compressed_1.pdf
 
-2) 
+2) https://www.puertocartagena.com/es/descargables-informativos
+
+3) 
