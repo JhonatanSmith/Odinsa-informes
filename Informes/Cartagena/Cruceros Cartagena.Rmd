@@ -1,0 +1,174 @@
+---
+title: "Analisis cruceros Cartagena de Indias"
+author: "Jhonatan Smith Garcia"
+date: "2022-10-09"
+output: rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(readxl)
+require(ggplot2)
+require(kableExtra)
+require(magrittr)
+require(janitor)
+library(dplyr)
+require(xtable)
+require(tidyverse)
+```
+
+
+# Contextualización
+
+El siguiente analisis busca entender de manera general, la industria de los cruceros en la ciudad de Cartagena. Para ello, se busca información existente en la web y se apalanca dicha información con tecnicas de captura de datos online. 
+
+El puerto de Cartagena lo adminsitra el grupo "GRUPO PUERTO DE CARTAGENA", que hace parte de la sociedad portuaria de Cartagena -empresas de infraestructura- , la cual fundada en 1993. Tenga presente que, para realizar entonces un correcto analisis del sector de los cruceros en la ciudad, se ha de conocer de manera general el contexto de la industria. 
+
+El puerto de Cartagena es un punto maritimo que atiende diferentes tipos de embarcaciones. En particular se tiene informacion para los años 2021 y 2022. Cabe destacar los efectos de la pandemia por COVID-19 han afectado significativamente los datos existentes, por tanto los analisis predictivos aqui presente son meramente descriptivos y *NO* una predicion confiable de los datos. Se toman datos de los años 2021 y 2022.
+
+Todos los analisis presentes se obtienen de diferentes fuentes de informacion. un primer analisis indiscriminado de los años, es del numero total de pasajeros por empresas que brindan los servicios de turismo en cruceros, en particular:
+
+```{r include=FALSE}
+total.2021 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2021.xlsx")
+total.2021[is.na(total.2021)] = 0
+total.2022 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2022.xlsx")
+total.2022[is.na(total.2022)] = 0
+total.2020 <- read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/Total_2020.xlsx")
+total.2020[is.na(total.2020)] = 0
+bd = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/bd.xlsx")
+bd21 = filter(.data =bd,  bd$Año==2021)
+bd22 = filter(.data =bd,  bd$Año==2022)
+cruc = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/total_empresa.xlsx")
+pax.mes = read_excel("C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Informes/Cartagena/total_empresa.xlsx", sheet = "Hoja2")
+names(pax.mes)= c("Mes", "Pax")
+```
+
+## Informacion por cruceros
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+names(cruc) = c("LINEA", "TOTAL.PAX")
+cruc %>%
+  arrange(TOTAL.PAX) %>%
+  mutate(LINEA = factor(LINEA, levels=LINEA)) %>%
+  ggplot( aes(x=LINEA, y=TOTAL.PAX)) +
+    geom_segment( aes(xend=LINEA, yend=0)) +
+    geom_point( size=4, color="red") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))+
+    ggtitle("PAX por crucero")+
+    xlab("") 
+  
+
+```
+El grafico anterior muestra informacion de cruceros que brindan servicio en el puerto de cartagena. Se podria pensar que existen tres tipos de servicios. el primero, dado por empresas que manejan un menor nunmero de pasajeros anualmente (aproximadamente diez mil pasajeros). En esta categoria se encuentran NORWEGIAN BLISS, ZUIDERDAM, MARELLA EXPLLORER 2. 
+
+Luego se encuentran los de tamaño medio, que podrian transportar anualmente hasta 20 mil pasajeros. 
+
+Y finalmente, los mas grandes, que segun los datos; anualmente transportan mas de 20 mil pasajeros, hasta 40.000; siendo este ultimo el EMERALD PRINCESS.
+
+## Total de pasajeros por mes
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+pax.mes %>%
+  #arrange(Pax) %>%
+  mutate(Mes = factor(Mes, levels=Mes)) %>%
+  ggplot( aes(x=Mes, y=Pax)) +
+    geom_segment( aes(xend=Mes, yend=0)) +
+    geom_point( size=4, color="red") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))+
+    ggtitle("Total pasajeros por mes")+
+    xlab("") 
+  
+
+```
+De manera analoga, se tiene el total de pasajeros par ala informacion de los meses encontrados. Note que existen meses donde la cantidad todal de pasajeros aumenta. Respecto a esto, tenga presente los ciclos de venta de ticket de un crucero. 
+
+## Gastos por pasajeros
+
+La siguiente tabla muestra informacion pertinente respecto al gasto promedio por persona en los cruceros. Esto, sin categorizar por año. 
+
+| Tipo de   pasajero | Número   de pasajeros | Gasto   promedio diario |        Ingresos   aproximados USD        |   
+|:------------------:|:---------------------:|:-----------------------:|:----------------------------------------:|
+|      Pasajeros     |        424,734        |          122,43         |  $                        52.000.183,62  |   
+|     Tripulantes    |        158,932        |          70.01          |  $                        11.126.829,32  |   
+
+
+# Analisis de mercado para el 2021
+
+Se tiene un total del numero de barcos registrados en el puerto de Cartagenta para el año 2021. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Hide = TRUE}
+tabla = total.2021[nrow(total.2021),] 
+tabla = tabla[,-1]
+kable(tabla)
+
+tabla = as.data.frame(tabla)
+barcos = names(tabla)
+num.barcos = tabla[1,] %>% as.character()
+num.barcos %<>% as.integer()
+df = cbind(barcos,num.barcos)
+df = df %>% as.data.frame()
+df = df[-nrow(df),]
+df$num.barcos=df$num.barcos %<>% as.numeric()
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df %>%
+  mutate(barcos = fct_reorder(barcos, desc(num.barcos))) %>%
+  ggplot( aes(x=barcos, y=num.barcos)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") + 
+    ggtitle("Cantidad total de barcos para el 2021")+
+    theme_bw()
+```
+
+El numero total de cruceros (Categoria Turismo) que se tiene para este año representa menos del 1% de la cantidad totales de embarcaciones que llegan a el puerto. 
+
+## Total de pasajeros
+
+
+
+#Analisis de mercado para el 2022
+
+Para el año 2022 se tiene la siguiente informacion hasta mayo. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+tabla = total.2022[nrow(total.2022),] 
+tabla = tabla[,-1]
+kable(tabla)
+tabla = as.data.frame(tabla)
+barcos = names(tabla)
+num.barcos = tabla[1,] %>% as.character()
+num.barcos %<>% as.integer()
+df = cbind(barcos,num.barcos)
+df = df %>% as.data.frame()
+df = df[-nrow(df),]
+df$num.barcos=df$num.barcos %>% as.numeric()
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df %>%
+  mutate(barcos = fct_reorder(barcos, desc(num.barcos))) %>%
+  ggplot( aes(x=barcos, y=num.barcos)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") + 
+    ggtitle("Cantidad total de barcos para el 2022")+
+    theme_bw()
+```
+
+El comportamiento general del tipo de embaraciones no ha cambiado de un año a otro. Note que para el año 2022 (solo hasta mayo) se nota un incremento considerable en la cantidad de barcos que llegan. Esto es dado el efecto del covid, puesto que para todo el año 2021 se tiene registro de 22 barcos turisticos en el puerto; lo que contrasta con el total obtenido hasta mayo en el 2022, un total de 56 barcos. 
+
+
+# Referencias
+
+1) https://www.puertocartagena.com/sites/default/files/inline/infografia-reactivacion-cruceros-porticolive_compressed_1.pdf
+
+2) 
