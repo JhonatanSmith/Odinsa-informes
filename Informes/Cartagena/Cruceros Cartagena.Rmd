@@ -11,8 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 library(readxl)
+require(gridExtra)
 require(ggplot2)
 require(kableExtra)
+require(lubridate)
 require(magrittr)
 require(janitor)
 library(dplyr)
@@ -25,7 +27,7 @@ require(tidyverse)
 
 El siguiente analisis busca entender de manera general, la industria de los cruceros en la ciudad de Cartagena. Para ello, se busca información existente en la web y se apalanca dicha información con tecnicas de captura de datos online. 
 
-El puerto de Cartagena lo adminsitra el grupo "GRUPO PUERTO DE CARTAGENA", que hace parte de la sociedad portuaria de Cartagena -empresas de infraestructura- , la cual fundada en 1993. Tenga presente que, para realizar entonces un correcto analisis del sector de los cruceros en la ciudad, se ha de conocer de manera general el contexto de la industria. 
+El puerto de Cartagena lo adminsitra el grupo "GRUPO PUERTO DE CARTAGENA", que hace parte de la sociedad portuaria de Cartagena -empresas de infraestructura- , la cual fue fundada en 1993. Tenga presente que, para realizar entonces un correcto analisis del sector de los cruceros en la ciudad, se ha de conocer de manera general el contexto de la industria. 
 
 El puerto de Cartagena es un punto maritimo que atiende diferentes tipos de embarcaciones. En particular se tiene informacion para los años 2021 y 2022. Cabe destacar los efectos de la pandemia por COVID-19 han afectado significativamente los datos existentes, por tanto los analisis predictivos aqui presente son meramente descriptivos y *NO* una predicion confiable de los datos. Se toman datos de los años 2021 y 2022.
 
@@ -33,7 +35,11 @@ A partir del 2021, el puerto de Cartagena comenzó un proceso de reactivacion ec
 
 [![Esta es una imagen de ejemplo](C:/Users/jhsga/OneDrive/Escritorio/ODINSA/Odinsa-informes/Informes/Cartagena/Captura de pantalla 2022-10-09 003016.png)]
 
-Todos los analisis presentes se obtienen de diferentes fuentes de informacion. un primer analisis indiscriminado de los años, es del numero total de pasajeros por empresas que brindan los servicios de turismo en cruceros, en particular:
+Se observa tanbien como la pandemia afectó considerablemente los ingresos del puerto. Se procede pues, bajo este contexto con los analisis.
+
+# Analisis generales
+
+Un primer analisis indiscriminado de los años, es del numero total de pasajeros por empresas que brindan los servicios de turismo en cruceros.
 
 ```{r include=FALSE}
 total.2021 <- read_excel("total_2021.xlsx")
@@ -45,6 +51,7 @@ total.2020[is.na(total.2020)] = 0
 bd = read_excel("bd.xlsx")
 bd21 = filter(.data =bd,  bd$Año==2021)
 bd22 = filter(.data =bd,  bd$Año==2022)
+recaladas <- read_excel("a1.xlsx")
 cruc = read_excel("total_empresa.xlsx")
 pax.mes = read_excel("total_empresa.xlsx", sheet = "Hoja2")
 names(pax.mes)= c("Mes", "Pax")
@@ -68,11 +75,14 @@ cruc %>%
   
 
 ```
-El grafico anterior muestra informacion de cruceros que brindan servicio en el puerto de cartagena. Se podria pensar que existen tres tipos de servicios. el primero, dado por empresas que manejan un menor nunmero de pasajeros anualmente (aproximadamente diez mil pasajeros). En esta categoria se encuentran NORWEGIAN BLISS, ZUIDERDAM, MARELLA EXPLLORER 2. 
+
+ El grafico anterior muestra informacion de cruceros que brindan servicio en el puerto de cartagena. Se podria pensar que existen tres tipos de servicios. el primero, dado por empresas que manejan un menor nunmero de pasajeros anualmente (aproximadamente diez mil pasajeros). En esta categoria se encuentran NORWEGIAN BLISS, ZUIDERDAM, MARELLA EXPLLORER 2. 
 
 Luego se encuentran los de tamaño medio, que podrian transportar anualmente hasta 20 mil pasajeros. 
 
 Y finalmente, los mas grandes, que segun los datos; anualmente transportan mas de 20 mil pasajeros, hasta 40.000; siendo este ultimo el EMERALD PRINCESS.
+
+Con el historico de datos, se tiene que el comportamiento de recaladas que llegan al puerto de Cartagena. Note que en el 2020 hubo una caida donde se veia un comportamiento creciente. Esto es esperable dado la pandemia. 
 
 ## Total de pasajeros por mes
 
@@ -91,7 +101,8 @@ pax.mes %>%
   
 
 ```
-De manera analoga, se tiene el total de pasajeros par ala informacion de los meses encontrados. Note que existen meses donde la cantidad todal de pasajeros aumenta. Respecto a esto, tenga presente los ciclos de venta de ticket de un crucero. 
+ 
+ De manera analoga, se tiene el total de pasajeros par ala informacion de los meses encontrados. Note que existen meses donde la cantidad todal de pasajeros aumenta. Respecto a esto, tenga presente los ciclos de venta de ticket de un crucero. 
 
 ## Gastos por pasajeros
 
@@ -101,6 +112,50 @@ La siguiente tabla muestra informacion pertinente respecto al gasto promedio por
 |:------------------:|:---------------------:|:-----------------------:|:----------------------------------------:|
 |      Pasajeros     |        424,734        |          122,43         |  $                        52.000.183,62  |   
 |     Tripulantes    |        158,932        |          70.01          |  $                        11.126.829,32  |   
+
+## Numero de recaladas por año
+
+Se define recalada a la accion de un buque de llegar a la costa. Para el puerto se tiene lo soguiente:
+
+
+```{r include=FALSE}
+recaladas %<>% rename(Year = "Año")
+bd %<>% rename(Eslora = 'Eslora (m)')
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = recaladas,aes(x = Year, y = Total,group = 1 ))+
+  geom_line(linetype = "dashed")+
+  geom_point(color = "red")+
+  ggtitle(label = "Total recaladas por año")
+  
+```
+
+## Sobre los pasajeros
+
+Segun los datos obtenidos de Citur, para entender el comportamiento de los cruceros; se tiene tambien datos acerca del tamaño de los mismos (Medida de 'Eslora') y la cantidad de pasajeros. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+attach(bd)
+par(mfrow=c(1,2))
+a<-ggplot(bd, aes(x=Pax))+
+  geom_histogram()+
+  ggtitle("Distribucion de pasajeros")
+b<-ggplot(bd, aes(x=Eslora))+
+  geom_histogram()+
+  ggtitle("Distribucion Eslora")
+grid.arrange(a,b)
+```
+Dados estos datos, parece haber 3 categoridas. Note que en los graficos, se "dividen" en tres grupos diferentes. 
+un primer grupo, que maneja un menor numero de pasajeros (entre 0 y 1000 pasajeros)
+
+
+```{r}
+plot(`Eslora`,`Load (Ton)`)
+```
 
 
 # Analisis de mercado para el 2021
@@ -139,7 +194,7 @@ El numero total de cruceros (Categoria Turismo) que se tiene para este año repr
 
 
 
-#Analisis de mercado para el 2022
+#Analisis de mercado
 
 Para el año 2022 se tiene la siguiente informacion hasta mayo. 
 
