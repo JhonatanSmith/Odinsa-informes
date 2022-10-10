@@ -55,6 +55,7 @@ total.2021[is.na(total.2021)] = 0
 total.2022 <- read_excel("total_2022.xlsx")
 total.2022[is.na(total.2022)] = 0
 total.2020 <- read_excel("Total_2020.xlsx")
+price = read.table("price.txt", header = T)
 total.2020[is.na(total.2020)] = 0
 bd = read_excel("bd.xlsx")
 bd21 = filter(.data =bd,  bd$Año==2021)
@@ -162,11 +163,6 @@ Dados estos datos, parece haber 3 categoridas. Note que en los graficos, se "div
 un primer grupo, que maneja un menor numero de pasajeros (entre 0 y 1000 pasajeros)
 
 
-```{r eval=FALSE, include=FALSE}
-plot(`Eslora`,`Load (Ton)`)
-```
-
-
 # Analisis de mercado para el 2021
 
 Se tiene un total del numero de barcos registrados en el puerto de Cartagenta para el año 2021. 
@@ -234,6 +230,11 @@ df %>%
 
 El comportamiento general del tipo de embaraciones no ha cambiado de un año a otro. Note que para el año 2022 (solo hasta mayo) se nota un incremento considerable en la cantidad de barcos que llegan. Esto es dado el efecto del covid, puesto que para todo el año 2021 se tiene registro de 22 barcos turisticos en el puerto; lo que contrasta con el total obtenido hasta mayo en el 2022, un total de 56 barcos. 
 
+# Precio promedio ticket
+
+Para el calculo del precio promedio, se realiza un muestreo de los datos de diferentes paginas web en las cuales se extrae la informacion del respectivo ticket de un crucero en funcion de la categoria. Asi, se tiene que:
+
+
 
 # Referencias
 
@@ -241,4 +242,9 @@ El comportamiento general del tipo de embaraciones no ha cambiado de un año a o
 
 2) https://www.puertocartagena.com/es/descargables-informativos
 
-3) https://portucolombia.mincit.gov.co/tematicas/estadisticas-territoriales-de-turismo-1
+3) https://www.cruceros.co/pd-4-cartagena-de-indias
+
+4) https://portucolombia.mincit.gov.co/tematicas/estadisticas-territoriales-de-turismo-1
+
+5) https://deluxetravel.com.co/cotizar-cruceros/
+
