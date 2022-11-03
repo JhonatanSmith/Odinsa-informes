@@ -1,0 +1,322 @@
+---
+title: "Cartagena de Indias Cruise Analysis"
+author: "Liliana Castro & Jhonatan Smith"
+date: "2022-10-09"
+output: rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(readxl)
+library(wesanderson)
+require(gridExtra)
+require(ggplot2)
+require(kableExtra)
+require(lubridate)
+require(magrittr)
+require(janitor)
+library(dplyr)
+require(xtable)
+require(tidyverse)
+```
+
+```{r include=FALSE}
+total.2021 <- read_excel("total_2021.xlsx")
+total.2021[is.na(total.2021)] = 0
+total.2022 <- read_excel("total_2022.xlsx")
+total.2022[is.na(total.2022)] = 0
+total.2020 <- read_excel("Total_2020.xlsx")
+price = read.table("price.txt", header = T)
+total.2020[is.na(total.2020)] = 0
+bd = read_excel("bd.xlsx")
+bd21 = filter(.data = bd, bd$Año==2021)
+bd22 = filter(.data =bd,  bd$Año==2022)
+puertos = read_excel("puertos.xlsx", sheet ="Hoja2")
+recaladas <- read_excel("a1.xlsx")
+cruc = read_excel("total_empresa.xlsx")
+pax.mes = read_excel("total_empresa.xlsx", sheet = "Hoja2")
+names(pax.mes)= c("Mes", "Pax")
+```
+
+# Contextualization
+
+The following analysis seeks to understand, in a general way, the cruise industry in the city of Cartagena. To do this, existing information is searched for on the web and this information is leveraged with online data capture techniques.
+
+The port of Cartagena is managed by the "GRUPO PUERTO DE CARTAGENA" group, which is part of the Cartagena port company -infrastructure companies-, which was founded in 1993. Keep in mind that, in order to carry out a correct analysis of the port sector, cruise ships in the city, the context of the industry must be generally known.
+
+The port of Cartagena is a maritime point that serves different types of vessels. In particular, there is information for the years 2021 to 2022. It should be noted that the effects of the COVID-19 pandemic have significantly affected the existing data, therefore, the predictive analyzes presented here are merely descriptive. Data are taken for exploratory analysis.
+
+As of 2021, the port of Cartagena began a process of economic reactivation caused by the pandemic. The economic projections of the Port are shown below.
+
+NOTE: Due coding index and syntaxis, some of the charts were not possible to get a full translation. They actually are possible to translate but it will delay the date to deliver the ouput.
+
+## Port Comparison
+
+The port of Cartagena de Indias in comparison with the other ports in the area, is the most important in terms of economic scope, operation and others.
+
+The following attached table shows the number of vessels that arrive in the three ports, this; categorized by year.
+
+
+```{r echo=FALSE}
+a = puertos[,1:19]
+kable(a)
+```
+
+```{r echo=FALSE}
+a = a[-4,]
+z =gather(data = a,key = "Puerto", value = "Total", 2:19) %>% as.data.frame()
+z$Total = z$Total/1000
+z= unique(z)
+
+ggplot(z, aes(x=c(1:nrow(z)), y = Total, col = Year))+
+         geom_line() +
+  xlab("Evolution 2000-20018")+
+  ylab("Boats")+
+  ggtitle("Boats by Port")+
+  theme(axis.text.x = element_blank())
+
+```
+
+
+Note that, by far, the port of Cartagena has a higher influx of boats.
+The scale of the graph (in thousands) shows that the behavior of said port is radically different over time, at least in volume of vessels;
+The analysis is carried out for said port.
+
+![](C:/Users/jgarcia/Desktop/Github/Odinsa-informes/Informes/Cartagena/Captura de pantalla 2022-10-09 003016.png)
+
+The previous graph shows the economic performance (in millions of US dollars) in the history of the data collected.
+Note that the values were increasing until before the pandemic. An exploratory graph of the history of tourism and trade data is attached.
+
+![](C:/Users/jgarcia/Desktop/Github/Odinsa-informes/Informes/Cartagena/graficas.png)
+
+For each of the graphs, the line of % growth/decrease with respect to the previous year is shown in pink.
+
+The bars represent the values ​​associated with the measured variable.
+
+
+# General analytics
+
+A first indiscriminate analysis of the years is the total number of passengers by companies that provide cruise tourism services.
+
+
+## Information by cruises
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+names(cruc) = c("LINEA", "TOTAL.PAX")
+cruc %>%
+  arrange(TOTAL.PAX) %>%
+  mutate(LINEA = factor(LINEA, levels=LINEA)) %>%
+  ggplot( aes(x=LINEA, y=TOTAL.PAX)) +
+    geom_segment( aes(xend=LINEA, yend=0)) +
+    geom_point( size=9, color="light blue") +
+    geom_text(aes(label = TOTAL.PAX), color = "black", size = 3)+
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))+
+    ggtitle("PAX by cruise (Anual)")+
+    xlab("") 
+  
+
+```
+
+The graph above shows information on cruise ships that provide service in the port of Cartagena. You might think that there are three types of services. the first, given by companies that handle a smaller number of passengers annually (approximately ten thousand passengers). In this category are NORWEGIAN BLISS, ZUIDERDAM, MARELLA EXPLLORER 2.
+
+Then there are the medium-sized ones, which could transport up to 20 thousand passengers annually.
+
+And finally, the largest, which according to the data; annually they transport more than 20 thousand passengers, up to 40,000; the latter being the EMERALD PRINCESS.
+
+With the historical data, the behavior of landfalls arriving at the port of Cartagena is obtained. Note that in 2020 there was a fall where a growing behavior was seen. This is to be expected given the pandemic.
+
+
+## Total passengers per month
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+pax.mes %>%
+  #arrange(Pax) %>%
+  mutate(Mes = factor(Mes, levels=Mes)) %>%
+  ggplot( aes(x=Mes, y=Pax)) +
+    geom_segment( aes(xend=Mes, yend=0)) +
+    geom_point( size=9, color="light blue") +
+    geom_text(aes(label = Pax), color = "black", size = 3)+
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))+
+    ggtitle("Total pax per month")+
+    xlab("") 
+  
+
+```
+ 
+ Similarly, we have the total number of passengers. Note that there are months where the total number of passengers increases. In this regard, keep in mind the cruise ticket sales cycles, that a reservation is usually made with a considerable margin of time when compared to airline services, for example.
+
+## Expenses per passenger
+
+The following table shows pertinent information regarding the average spend per person on cruises. This, without categorizing by year.
+
+| PAX type | # of PAX | Daily expenses USD |        Incoming   aprox. USD        |   
+|:------------------:|:---------------------:|:-----------------------:|:----------------------------------------:|
+|      PAX     |        424,734        |          122,43         |                          52.000.183 |   
+|     Crew    |        158,932        |          70.01          |                          11.126.829 |   
+
+## Number of landfalls per year
+
+Landfall is defined as the action of a ship to reach port. For the port we have the following:
+
+```{r include=FALSE}
+recaladas %<>% rename(Year = "Año")
+bd %<>% rename(Eslora = 'Eslora (m)')
+```
+
+
+The graph above shows the evolution over time of the number of annual calls in the port of Cartagena. It is noted that, until before 2020; there was a tendency to grow. Once again, the pandemic affected this growth pattern.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = recaladas,aes(x = Year, y = Total,group = 1 ))+
+  geom_line(linetype = "dashed")+
+  geom_point(color = "red")+
+  ggtitle(label = "Total Landfalls per year")
+  
+```
+
+## About passengers
+
+According to data obtained from Citur, to understand the behavior of cruise ships; data is also available about their size (Measurement of 'Length') and the number of passengers.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+attach(bd)
+par(mfrow=c(1,2))
+a<-ggplot(bd, aes(x=Pax))+
+  geom_histogram(color="darkblue", fill="lightblue")+
+  ggtitle("PAX distribution")
+b<-ggplot(bd, aes(x=Eslora))+
+  geom_histogram(color="darkblue", fill="lightblue")+
+  ggtitle("Lenght distribution")
+grid.arrange(a,b)
+```
+
+Given these data, there seem to be 3 categories. Notice that, in the charts, they are "split" into three different groups.
+a first group, which handles a smaller number of passengers (between 0 and 1000 passengers)
+
+The next group, between 2000 passengers and less than 4 thousand.
+
+The third group, more than 4 thousand passengers.
+
+This analysis is consistent in relation to the distribution of the Length; where 3 large groups are also segregated. Small, medium and large lengths.
+
+
+# Market analysis for 2021
+
+There is a total number of ships registered in the port of Cartagena for the year 2021.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Hide = TRUE}
+tabla = total.2021[nrow(total.2021),] 
+tabla = tabla[,-1]
+kable(tabla)
+
+tabla = as.data.frame(tabla)
+barcos = names(tabla)
+num.barcos = tabla[1,] %>% as.character()
+num.barcos %<>% as.integer()
+df = cbind(barcos,num.barcos)
+df = df %>% as.data.frame()
+df = df[-nrow(df),]
+df$num.barcos=df$num.barcos %<>% as.numeric()
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df %>%
+  mutate(barcos = fct_reorder(barcos, desc(num.barcos))) %>%
+  ggplot( aes(x=barcos, y=num.barcos)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") + 
+    ggtitle("Total boats 2021")+
+    theme_bw()
+```
+
+The total number of cruise ships (Tourism Category) for this year represents less than 1% of the total number of ships arriving at the port.
+
+## Total passengers
+
+
+# Market analysis
+
+For the year 2022, the following information is available up to May.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+tabla = total.2022[nrow(total.2022),] 
+tabla = tabla[,-1]
+kable(tabla)
+tabla = as.data.frame(tabla)
+barcos = names(tabla)
+num.barcos = tabla[1,] %>% as.character()
+num.barcos %<>% as.integer()
+df = cbind(barcos,num.barcos)
+df = df %>% as.data.frame()
+df = df[-nrow(df),]
+df$num.barcos=df$num.barcos %>% as.numeric()
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df %>%
+  mutate(barcos = fct_reorder(barcos, desc(num.barcos))) %>%
+  ggplot( aes(x=barcos, y=num.barcos)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") + 
+    ggtitle("Total boats 2022")+
+    theme_bw()
+```
+
+The general behavior of the type of vessels has not changed from one year to another. Note that for the year 2022 (only until May) there is a considerable increase in the number of ships that arrive. This is given the effect of COVID, since for the entire year 2021 there is a record of 22 tourist boats in the port; which contrasts with the total obtained until May 2022, a total of 56 ships.
+
+# Average ticket price
+
+To calculate the average price, a sample is made of the data from different web pages in which the information of the respective cruise ticket is extracted based on the category. Thus, you have to:
+
+```{r include=FALSE}
+
+a <- price$Estandar %>% t.test()
+b <- price$Estandar_Ventana %>% t.test()
+c <- price$Balcon %>% t.test()
+d <- price$Suite %>% t.test()
+
+medias <- c(a[5],b[5], c[5], d[5])
+medias %<>% as.data.frame()
+names(medias) = c("Standard", "Standard_window", "Balcony", "Suite")
+
+IC = c(a[4],b[4],c[4],d[4])
+IC %<>% as.data.frame()
+names(IC) = c("IC Standardr", "IC Standard_window", "Balcony", "IC Suite")
+```
+
+
+The following tables present the average value of a ticket based on the category.
+On cruises, there are several categories of tickets (rooms) to reserve. In this case, the most basic ticket offers a single room on the boat. The second category offers a room with a window, the third, a room with a balcony and finally the highest category is the suite.
+To carry out these calculations, a general sampling is carried out to understand the behavior of these prices. The first table provides the average values ​​of these tickets. This is the value that tickets in these categories would be expected to take.
+The second table presents what are called "Confidence Intervals"; abbreviated as IC.
+The latter are used to give a general behavior of the variability. In a nutshell, the first line presents the minimum lower value that a ticket of a given category can take. The second line of the table shows the maximum value that the ticket can take.
+
+```{r echo=FALSE}
+kable(medias)
+```
+
+```{r echo=FALSE}
+kable(IC)
+```
+
+
+# Based on:
+
+1) https://www.puertocartagena.com/sites/default/files/inline/infografia-reactivacion-cruceros-porticolive_compressed_1.pdf
+
+2) https://www.puertocartagena.com/es/descargables-informativos
+
+3) https://www.cruceros.co/pd-4-cartagena-de-indias
+
+4) https://portucolombia.mincit.gov.co/tematicas/estadisticas-territoriales-de-turismo-1
+
+5) https://deluxetravel.com.co/cotizar-cruceros/
+
