@@ -1,0 +1,44 @@
+---
+title: "Levantamiento bases de datos 'La Pintada'"
+author: "Jhonatan Smith Garcia"
+date: "16-09-2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+La visita a “Concesiones La Pintada” se llevó a cabo el día 16 de septiembre del 2022. En dicha reunión, se contextualiza a parte del equipo de recolección de datos acerca de los pilotos que se están llevando en conjunto con HUMAN en las diferentes concesiones de ODINSA.
+Parte de todo este proceso, se hace a petición de David Lopez para entender el potencial que hay detrás de cada uno de los pilotos que eventualmente, se realizarán en conjunto con HUMAN. 
+
+Cabe destacar que, los sistemas de información de “La Pintada” recopilan mucha data, que a priori, permite realizar diferentes tipos de análisis para la comprensión de la concesión. Se hace un breve resumen de las bases de datos existentes en dicha concesión.
+
+Las bases suministradas a la fecha se dividen en dos grandes categorías: La información que se recopilan en los peajes y la información que recopilan los demás sistemas de información.
+
+Sobre los peajes: Se tienen las siguientes bases de datos
+
+1)	Reporte de transacciones (con fecha, valor, sentido, placa)
+
+2)	Listado de pesaje por cada sentido (Fecha, hora, placa, código del vehículo, peso total, peso autorizado, sobrepeso, sobre altura, empresa que transporta)
+
+Sobre los sistemas de información: Se tienen las siguientes bases de datos
+
+1.	Informe de evento (registro uno a uno el tipo de evento vial, con una descripción detallada. Información guardada en hojas de Excel para cada accidente.)
+
+2.	Registro de incidentes (Fecha, solicitud, señalización, finalización, tiempo de respuesta ruta, Tipo de incidente, tipo de vehículo, causa de incidente, inspector, carro taller, grúa)
+
+3.	Registro de accidente (Fecha, hora solicitud, tiempo respuesta, tipo accidente, causa accidente, ruta, categorización del accidente, tipo de conductor, etc.)
+
+4.	Registro de velocidades (Fecha, numero de mediciones, Promedio de velocidad), equipo de medición)
+
+5.	Estado del tiempo (fecha cada media hora, tiempo en tres categorías: Soleado, nublado, lluvia)
+
+6.	Rescate de fauna (Número total rescatado por mes y año, fecha, nombre común, coordenadas)
+
+7.	Registro atropellamiento de fauna (Fecha, hora, ID animal, nombre común, Proyecto de ocurrencia, coordenadas, cobertura, total)
+
+De manera general, se mencionaron algunas variables para dar un contexto general al tipo de dato que se recopila, pero no son las únicas variables de las que se tiene registro para cada base de datos. 
+
+
+

@@ -1,0 +1,17 @@
+---
+title: "Analisis descriptivos Bases de datos 'La Pintada'"
+date: "Julio, 2021"
+output:
+  rmdformats::readthedown
+  
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro
+
+Se propone un breve ejercicio para realizar un analisis descriptivo muy general de las bases de datos correspondientes a concesiones la pintada. 
+
