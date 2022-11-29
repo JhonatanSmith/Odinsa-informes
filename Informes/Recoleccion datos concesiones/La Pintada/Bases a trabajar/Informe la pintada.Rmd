@@ -1,0 +1,151 @@
+---
+title: "Analisis descriptivos Bases de datos 'La Pintada': Incidentes viales"
+date: "Julio, 2021"
+output:
+  rmdformats::readthedown
+  
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+require(tidyverse)
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(hrbrthemes)
+require(janitor)
+require(magrittr)
+require(ggplot2)
+require(kableExtra)
+```
+
+
+# Sobre este informe
+
+Se desea analizar los incidentes viales reportados por concesiones 'La Pintada'.
+
+```{r}
+
+bd <- read_excel("Informe_Accidentes_Incidentes_organizado.xlsx")
+bd %<>% clean_names()
+bd$tipo_de_accidente =bd$tipo_de_accidente %>% as.factor()
+```
+
+
+```{r}
+library(readr)
+a <- read_csv("train.csv")
+df = data.frame(a$`Flight Distance`)
+```
+
+```{r}
+# Vector que tiene todas las distancias
+x = a$`Flight Distance`
+x %>% list
+
+# Criterios
+c1 = x[x<350] %>% length()
+c2 = x[x>350&x<700] %>% length()
+c3 = x[x>700&x<1050]%>% length()
+c4 = x[x>1050&x<1400]%>% length()
+c5 = x[x>1400&x<1750]%>% length()
+c6 = x[x>1750&x<2100]%>% length()
+c7 = x[x>2100&x<2450]%>% length()
+c8 = x[x>2450&x<2800]%>% length()
+c9 = x[x>2800]%>% length()
+```
+
+
+```{r}
+c1
+c2
+```
+
+
+
+```{r}
+# Por categorias
+z = c(c1,c2, c3,c4,c5,c6,c7,c8, c9)
+z
+
+```
+
+```{r}
+total = sum(z)
+porcentaje = z/total
+porcentaje
+porcentaje %<>% as.matrix(ncol =1,nrow=9) %>% as.data.frame()
+porcentaje = round(porcentaje,3)
+names(porcentaje)= c("Porcentajes")
+porcentaje %>% kable()
+```
+
+```{r}
+barplot(porcentaje$Porcentajes)
+```
+
+
+
+```{r}
+data = data.frame(
+  name = c('350<', '350-700','700-1050','1050-1400','1400-1750','1750-2100','2100-2450','2450-2800', '>2800'),  value = z)
+```
+
+```{r}
+data %<>% mutate(name = fct_relevel(name,'350<', '350-700','700-1050','1050-1400','1400-1750','1750-2100','2100-2450','2450-2800', '>2800')) 
+```
+
+
+
+
+```{r}
+
+# Barplot
+ggplot(data, aes(x=name, y=value)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "blue")+scale_fill_hue(c = 40) + xlab('Miles/Flight')+ylab(" Passengers 2022 - Q1")+ 
+  ggtitle('Passengers vs Flight Miles')
+```
+
+
+
+```{r}
+smith = data.frame(x= data$name, y = porcentaje$Porcentajes)
+```
+
+```{r}
+
+# Barplot
+ggplot(smith, aes(x=x, y=y)) + 
+  geom_segment( aes(xend=x, yend=0))+
+  geom_point(size=10, color="#69b3a2")+scale_fill_hue(c = 40) + xlab('Miles/Flight')+ylab("Percentage %")+ 
+  ggtitle('% Passengers')+
+  geom_text(aes(label = y), color = "black", size = 3)
+```
+
+
+```{r}
+#plot
+
+smith %>%
+  filter(!is.na(y)) %>%
+  arrange(y) %>%
+  tail(20) %>%
+  mutate(x=factor(x, x)) %>%
+  ggplot( aes(x=x, y=y) ) +
+    geom_segment( aes(x=x ,xend=y, y=0, yend=y), color="grey") +
+    geom_point(size=3, color="#69b3a2") +
+    coord_flip() +
+    theme_ipsum() +
+    theme(
+      panel.grid.minor.y = element_blank(),
+      panel.grid.major.y = element_blank(),
+      legend.position="none"
+    ) +
+    xlab("") +
+    ylab("Porcentaje")
+```
+
+
+

@@ -1,10 +1,4 @@
----
-title: "Analisis descriptivos Bases de datos 'La Pintada'"
-date: "Julio, 2021"
-output:
-  rmdformats::readthedown
-  
----
+
 
 
 ```{r setup, include=FALSE}
