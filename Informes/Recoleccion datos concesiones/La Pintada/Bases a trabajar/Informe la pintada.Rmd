@@ -111,7 +111,7 @@ ggplot(data, aes(x=name, y=value)) +
 
 
 ```{r}
-smith = data.frame(x= data$name, y = porcentaje$Porcentajes)
+smith = data.frame(x= data$name, y = data$value)
 ```
 
 ```{r}
@@ -126,26 +126,79 @@ ggplot(smith, aes(x=x, y=y)) +
 
 
 ```{r}
-#plot
-
-smith %>%
-  filter(!is.na(y)) %>%
-  arrange(y) %>%
-  tail(20) %>%
-  mutate(x=factor(x, x)) %>%
-  ggplot( aes(x=x, y=y) ) +
-    geom_segment( aes(x=x ,xend=y, y=0, yend=y), color="grey") +
-    geom_point(size=3, color="#69b3a2") +
-    coord_flip() +
-    theme_ipsum() +
-    theme(
-      panel.grid.minor.y = element_blank(),
-      panel.grid.major.y = element_blank(),
-      legend.position="none"
-    ) +
-    xlab("") +
-    ylab("Porcentaje")
+prueba = read.csv("Jan_2020_ontime.csv")
+pr = prueba$DISTANCE
 ```
 
+```{r}
+pr %>% hist()
+```
+
+```{r include=FALSE}
+
+x = pr
+x %>% list
+
+# Criterios
+c1 = x[x<350] %>% length()
+c2 = x[x>350&x<700] %>% length()
+c3 = x[x>700&x<1050]%>% length()
+c4 = x[x>1050&x<1400]%>% length()
+c5 = x[x>1400&x<1750]%>% length()
+c6 = x[x>1750&x<2100]%>% length()
+c7 = x[x>2100&x<2450]%>% length()
+c8 = x[x>2450&x<2800]%>% length()
+c9 = x[x>2800]%>% length()
+```
+
+
+
+
+```{r}
+# Por categorias
+z = c(c1,c2, c3,c4,c5,c6,c7,c8, c9)
+total = z %>% sum
+porcentaje = z/total
+
+```
+
+```{r}
+data = data.frame(
+  name = c('350<', '350-700','700-1050','1050-1400','1400-1750','1750-2100','2100-2450','2450-2800', '>2800'),  value = porcentaje*100)
+```
+
+```{r}
+data %<>% mutate(name = fct_relevel(name,'350<', '350-700','700-1050','1050-1400','1400-1750','1750-2100','2100-2450','2450-2800', '>2800')) 
+
+data$value= round(data$value,2)
+```
+
+
+```{r}
+# Barplot
+ggplot(data, aes(x=name, y=value)) + 
+  geom_bar(stat = "identity", color = "#69b3a2", fill = "blue",width = 0.5)+
+  scale_fill_hue(c = 40) +
+  xlab('Miles/Flight')+
+  ylab("Passengers 2019-2020")+ 
+  ggtitle('Passengers vs Flight Miles')+
+  geom_text(aes(label = value), vjust = -0.2)
+```
+
+```{r}
+library(readr)
+library(openxlsx)
+data <- read_csv(file.choose())
+View(data)
+write_excel_csv()
+
+write.csv(,file = "data.xlsx", sep = ',',)
+
+write.xlsx(Datos, "table_car.xlsx")
+
+data= data[,]
+
+write.xlsx(x = data,file = 'smith.xlsx')
+```
 
 
